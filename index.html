@@ -7,102 +7,189 @@
     <style>
         :root { --navy: #1A3068; --red: #C01030; --green: #059669; --gray: #6B7280; --border: #E5E7EB; }
         body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; background: #F3F4F6; color: #1A1A1A; }
-        .header { background: linear-gradient(135deg, var(--navy) 0%, var(--red) 100%); padding: 30px 20px; color: white; text-align: center; }
-        .container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
-        .card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 12px; cursor: pointer; display: flex; align-items: center; gap: 15px; transition: 0.2s; width: 100%; border-style: solid; text-align: left; font-size: 16px; }
-        .card:hover { border-color: var(--red); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .btn-back { background: none; border: none; color: var(--navy); font-weight: bold; cursor: pointer; padding: 10px 0; display: flex; align-items: center; gap: 5px; }
-        .progress-container { background: #E5E7EB; height: 8px; border-radius: 4px; margin: 15px 0; overflow: hidden; }
-        .progress-bar { background: var(--red); height: 100%; width: 0%; transition: 0.3s; }
-        .input-ref { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
-        .check-item { background: white; border: 1px solid var(--border); padding: 14px; border-radius: 10px; margin-bottom: 8px; display: flex; align-items: flex-start; gap: 12px; cursor: pointer; }
+        .header { background: linear-gradient(135deg, var(--navy) 0%, var(--red) 100%); padding: 35px 20px; color: white; text-align: center; }
+        .container { max-width: 500px; margin: 20px auto; padding: 0 15px; padding-bottom: 50px; }
+        .card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 12px; cursor: pointer; display: flex; align-items: center; gap: 15px; transition: 0.2s; width: 100%; text-align: left; font-size: 16px; box-sizing: border-box; }
+        .card:hover { border-color: var(--red); box-shadow: 0 4px 12px rgba(0,0,0,0.08); transform: translateY(-2px); }
+        .btn-back { background: none; border: none; color: var(--navy); font-weight: bold; cursor: pointer; padding: 15px 0; display: flex; align-items: center; gap: 8px; font-size: 14px; }
+        .progress-container { background: #E5E7EB; height: 10px; border-radius: 5px; margin: 20px 0; overflow: hidden; }
+        .progress-bar { background: linear-gradient(90deg, var(--red), var(--navy)); height: 100%; width: 0%; transition: 0.4s ease; }
+        .input-ref { width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 20px; box-sizing: border-box; font-size: 15px; outline: none; }
+        .input-ref:focus { border-color: var(--navy); }
+        .check-item { background: white; border: 1px solid var(--border); padding: 16px; border-radius: 12px; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 14px; cursor: pointer; transition: 0.2s; }
         .check-item.checked { background: #ECFDF5; border-color: var(--green); opacity: 0.8; }
-        .check-item.alert { border-left: 4px solid var(--red); }
-        .check-item input { width: 18px; height: 18px; margin-top: 2px; }
-        .btn-finish { width: 100%; padding: 15px; background: var(--navy); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 15px; }
-        .hidden { display: none; }
-        .history-section { margin-top: 30px; font-size: 13px; color: var(--gray); }
-        .history-item { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid var(--border); }
+        .check-item.alert { border-left: 5px solid var(--red); background: #FDF2F2; }
+        .check-item input { width: 20px; height: 20px; margin-top: 2px; cursor: pointer; }
+        .btn-finish { width: 100%; padding: 16px; background: var(--navy); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 16px; }
+        .hidden { display: none !important; }
+        .section-title { font-size: 12px; font-weight: bold; color: var(--navy); margin: 20px 0 10px 5px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #EEE; padding-bottom: 5px; }
+        .history-item { background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 8px; display: flex; justify-content: space-between; font-size: 13px; }
     </style>
 </head>
 <body>
 
 <div id="view-home">
     <div class="header">
-        <div style="font-size: 12px; opacity: 0.8; letter-spacing: 2px; margin-bottom: 5px;">PORTAIL DE CONFORMITÉ</div>
-        <div style="font-size: 24px; font-weight: 800;">Checklist Procédures</div>
+        <div style="font-size: 11px; opacity: 0.8; letter-spacing: 3px; margin-bottom: 8px; text-transform: uppercase;">Portail Procédures Internes</div>
+        <div style="font-size: 26px; font-weight: 800; letter-spacing: -1px;">Checklist de Contrôle</div>
     </div>
     <div class="container">
-        <p style="font-size: 13px; color: var(--gray); font-weight: bold;">SÉLECTIONNER UN PROCESSUS</p>
-        <div class="card" onclick="showSubTypes('ndf')"><span>📋</span> <strong>1. Notes de Frais (NDF)</strong></div>
-        <div class="card" onclick="startChecklist('debit')"><span>📑</span> <strong>2. Notes de débit</strong></div>
-        <div class="card" onclick="startChecklist('facturation')"><span>🧾</span> <strong>4. Facturation</strong></div>
+        <p style="font-size: 12px; color: var(--gray); font-weight: 800; margin-bottom: 15px; text-transform: uppercase;">Sélectionner un processus</p>
+        <div class="card" onclick="openNav('ndf')"><span>📋</span> <strong>1. Notes de Frais (NDF)</strong></div>
+        <div class="card" onclick="openNav('debit')"><span>📑</span> <strong>2. Notes de débit</strong></div>
+        <div class="card" onclick="openNav('ovinpiades')"><span>🐑</span> <strong>3. PROJ-03 (Événementiel)</strong></div>
+        <div class="card" onclick="openNav('facturation')"><span>🧾</span> <strong>4. Facturation Entrante</strong></div>
         
-        <div id="history-container" class="history-section hidden">
-            <p>HISTORIQUE RÉCENT</p>
+        <div id="history-box" class="hidden" style="margin-top: 40px;">
+            <p style="font-size: 12px; color: var(--gray); font-weight: 800; text-transform: uppercase;">Derniers dossiers</p>
             <div id="history-list"></div>
         </div>
     </div>
 </div>
 
 <div id="view-subtypes" class="container hidden">
-    <button class="btn-back" onclick="showView('view-home')">← RETOUR</button>
-    <h3 id="subtype-title">Type de protocole</h3>
+    <button class="btn-back" onclick="showView('view-home')">← ACCUEIL</button>
+    <h3 id="subtype-header" style="color: var(--navy);">Type de dossier</h3>
     <div id="subtype-list"></div>
 </div>
 
 <div id="view-checklist" class="container hidden">
-    <button class="btn-back" onclick="goBackFromChecklist()">← RETOUR</button>
+    <button class="btn-back" id="back-to-sub">← RETOUR</button>
     <div class="progress-container"><div id="progress-bar" class="progress-bar"></div></div>
-    <input type="text" id="dossier-ref" class="input-ref" placeholder="Référence du dossier...">
+    <input type="text" id="dossier-ref" class="input-ref" placeholder="Nom du dossier ou référence ERP...">
     <div id="check-list"></div>
-    <button class="btn-finish" onclick="finishDossier()">TERMINER ET SAUVEGARDER</button>
+    <button class="btn-finish" onclick="saveToHistory()">VALIDER ET ARCHIVER</button>
 </div>
 
 <script>
-    // DONNÉES ANONYMISÉES
-    const DATA = {
+    const CONFIG = {
         ndf: {
             title: "Notes de Frais",
-            subTypes: [
+            subs: [
                 { id: 'int', label: "Cas interne", color: '#1A3068' },
                 { id: 'ext_p', label: "Cas externe (Physique)", color: '#1A3068' },
                 { id: 'ext_m', label: "Cas externe (Moral)", color: '#C01030' }
             ],
             checks: {
-                int: [
-                    { text: "Événement générateur précisé (Objet)" },
-                    { text: "Concordance montants/dates" },
-                    { text: "Code analytique budget service noté" },
-                    { text: "Code affaire vérifié sur ERP" },
-                    { text: "Vérification absence de cumul Titre-Resto" }
-                ],
-                ext_p: [{ text: "Objet dépense précisé" }, { text: "Code affaire vérifié sur ERP" }],
-                ext_m: [{ text: "FACTURE obligatoire", alert: true }, { text: "Modèle XLS spécifique moral", alert: true }]
+                int: [{text:"Objet précisé (Événement)"},{text:"Vérification Montants/Dates"},{text:"Code analytique budget noté"},{text:"Code affaire vérifié sur ERP"},{text:"Contrôle Titre-Resto (Non cumulable)"},{text:"Attestation si original manquant"}],
+                ext_p: [{text:"Objet dépense précisé"},{text:"Code affaire vérifié sur ERP"},{text:"Justificatifs kilométriques validés"}],
+                ext_m: [{text:"FACTURE obligatoire", alert:true},{text:"Modèle document moral utilisé", alert:true},{text:"Code affaire vérifié sur ERP"}]
             }
         },
         debit: {
             title: "Notes de débit",
-            checks: { default: [{ text: "Justificatifs + attestation reçus" }, { text: "Séquençage Note > Attestation > Récap" }, { text: "Aucun code analytique saisi", alert: true }] }
+            checks: { default: [{text:"Justificatifs + attestation reçus"},{text:"Ordre: Note > Attestation > Récap"},{text:"Aucun code analytique saisi", alert:true},{text:"Transmission pôle validation"}] }
+        },
+        ovinpiades: {
+            title: "PROJ-03 (Événementiel)",
+            subs: [
+                { id: 'm', label: "Personne Morale", color: '#C01030' },
+                { id: 'p', label: "Personne Physique", color: '#1A3068' }
+            ],
+            checks: {
+                m: [{text:"Dépôt via portail numérique"},{text:"Facture présente (Obligatoire)"},{text:"Récapitulatif et justificatifs complets"},{text:"Vérification ouverture code projet ERP"},{text:"Plafond tickets transport (Max 5)", alert:true}],
+                p: [{text:"Dépôt via portail numérique"},{text:"Justificatifs complets"},{text:"Vérification ouverture code projet ERP"},{text:"Plafond tickets transport (Max 5)", alert:true}]
+            }
         },
         facturation: {
             title: "Facturation",
-            checks: { default: [{ text: "ERP : codes action/affaire/analytique" }, { text: "Montant engagé vs facturé" }, { text: "SIRET et coordonnées bancaires présents" }] }
+            checks: { default: [{text:"ERP: Codes action/affaire/analytique"},{text:"Engagé vs Facturé vérifié"},{text:"Code article (Service/Hono/Conseil)"},{text:"Conformité pièce jointe", section:"Légal"},{text:"SIRET et Coordonnées bancaires", section:"Légal"}] }
         }
     };
 
-    let currentProcess = '';
-    let currentSub = '';
-    let history = JSON.parse(localStorage.getItem('itb_history') || '[]');
+    let activeProc = '';
+    let activeSub = '';
+    let db = JSON.parse(localStorage.getItem('itb_v2_db') || '[]');
 
-    function showView(id) {
-        document.querySelectorAll('.container, #view-home').forEach(v => v.classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
-        if(id === 'view-home') renderHistory();
+    function showView(viewId) {
+        document.getElementById('view-home').classList.add('hidden');
+        document.getElementById('view-subtypes').classList.add('hidden');
+        document.getElementById('view-checklist').classList.add('hidden');
+        document.getElementById(viewId).classList.remove('hidden');
+        if(viewId === 'view-home') renderHistory();
     }
 
-    function showSubTypes(id) {
-        currentProcess = id;
-        const list = document.getElementById('subtype-list');
+    function openNav(id) {
+        activeProc = id;
+        if (CONFIG[id].subs) {
+            const list = document.getElementById('subtype-list');
+            list.innerHTML = '';
+            document.getElementById('subtype-header').innerText = CONFIG[id].title;
+            CONFIG[id].subs.forEach(s => {
+                const b = document.createElement('div');
+                b.className = 'card';
+                b.style.borderLeft = `6px solid ${s.color}`;
+                b.innerHTML = `<strong>${s.label}</strong>`;
+                b.onclick = () => initChecklist(s.id);
+                list.appendChild(b);
+            });
+            showView('view-subtypes');
+        } else {
+            initChecklist('default');
+        }
+    }
+
+    function initChecklist(subId) {
+        activeSub = subId;
+        const list = document.getElementById('check-list');
         list.innerHTML = '';
-        DATA[id].subTypes.forEach(st
+        const checks = CONFIG[activeProc].checks[subId];
+        let lastSec = '';
+
+        checks.forEach(c => {
+            if(c.section && c.section !== lastSec) {
+                const s = document.createElement('div');
+                s.className = 'section-title';
+                s.innerText = c.section;
+                list.appendChild(s);
+                lastSec = c.section;
+            }
+            const item = document.createElement('div');
+            item.className = `check-item ${c.alert ? 'alert' : ''}`;
+            item.innerHTML = `<input type="checkbox"> <span>${c.text}</span>`;
+            item.onclick = (e) => {
+                if(e.target.tagName !== 'INPUT') item.querySelector('input').checked = !item.querySelector('input').checked;
+                refreshUI();
+            };
+            list.appendChild(item);
+        });
+
+        document.getElementById('back-to-sub').onclick = () => CONFIG[activeProc].subs ? showView('view-subtypes') : showView('view-home');
+        document.getElementById('dossier-ref').value = '';
+        refreshUI();
+        showView('view-checklist');
+    }
+
+    function refreshUI() {
+        const all = document.querySelectorAll('#check-list input');
+        const done = document.querySelectorAll('#check-list input:checked');
+        const pct = all.length ? Math.round((done.length / all.length) * 100) : 0;
+        document.getElementById('progress-bar').style.width = pct + '%';
+        document.querySelectorAll('.check-item').forEach(el => {
+            el.classList.toggle('checked', el.querySelector('input').checked);
+        });
+    }
+
+    function saveToHistory() {
+        const name = document.getElementById('dossier-ref').value || 'Sans référence';
+        const pct = document.getElementById('progress-bar').style.width;
+        db.unshift({ name, info: CONFIG[activeProc].title, pct, date: new Date().toLocaleDateString() });
+        db = db.slice(0, 5);
+        localStorage.setItem('itb_v2_db', JSON.stringify(db));
+        showView('view-home');
+    }
+
+    function renderHistory() {
+        const box = document.getElementById('history-box');
+        const list = document.getElementById('history-list');
+        if(db.length > 0) {
+            box.classList.remove('hidden');
+            list.innerHTML = db.map(i => `<div class="history-item"><span><b>${i.name}</b><br><small>${i.info}</small></span><span style="color:var(--navy)">${i.pct}</span></div>`).join('');
+        }
+    }
+
+    window.onload = renderHistory;
+</script>
+
+</body>
+</html>

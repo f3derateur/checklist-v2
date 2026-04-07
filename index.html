@@ -3,134 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checklist Procédures - Interbev</title>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <title>Portail de Conformité Procédures</title>
     <style>
-        body { margin: 0; background-color: #F3F4F6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        #root { min-height: 100vh; }
+        :root { --navy: #1A3068; --red: #C01030; --green: #059669; --gray: #6B7280; --border: #E5E7EB; }
+        body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; background: #F3F4F6; color: #1A1A1A; }
+        .header { background: linear-gradient(135deg, var(--navy) 0%, var(--red) 100%); padding: 30px 20px; color: white; text-align: center; }
+        .container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
+        .card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 12px; cursor: pointer; display: flex; align-items: center; gap: 15px; transition: 0.2s; width: 100%; border-style: solid; text-align: left; font-size: 16px; }
+        .card:hover { border-color: var(--red); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .btn-back { background: none; border: none; color: var(--navy); font-weight: bold; cursor: pointer; padding: 10px 0; display: flex; align-items: center; gap: 5px; }
+        .progress-container { background: #E5E7EB; height: 8px; border-radius: 4px; margin: 15px 0; overflow: hidden; }
+        .progress-bar { background: var(--red); height: 100%; width: 0%; transition: 0.3s; }
+        .input-ref { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; }
+        .check-item { background: white; border: 1px solid var(--border); padding: 14px; border-radius: 10px; margin-bottom: 8px; display: flex; align-items: flex-start; gap: 12px; cursor: pointer; }
+        .check-item.checked { background: #ECFDF5; border-color: var(--green); opacity: 0.8; }
+        .check-item.alert { border-left: 4px solid var(--red); }
+        .check-item input { width: 18px; height: 18px; margin-top: 2px; }
+        .btn-finish { width: 100%; padding: 15px; background: var(--navy); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        .hidden { display: none; }
+        .history-section { margin-top: 30px; font-size: 13px; color: var(--gray); }
+        .history-item { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid var(--border); }
     </style>
 </head>
 <body>
-    <div id="root"></div>
 
-    <script type="text/babel">
-        const { useState, useEffect, useCallback } = React;
+<div id="view-home">
+    <div class="header">
+        <div style="font-size: 12px; opacity: 0.8; letter-spacing: 2px; margin-bottom: 5px;">PORTAIL DE CONFORMITÉ</div>
+        <div style="font-size: 24px; font-weight: 800;">Checklist Procédures</div>
+    </div>
+    <div class="container">
+        <p style="font-size: 13px; color: var(--gray); font-weight: bold;">SÉLECTIONNER UN PROCESSUS</p>
+        <div class="card" onclick="showSubTypes('ndf')"><span>📋</span> <strong>1. Notes de Frais (NDF)</strong></div>
+        <div class="card" onclick="startChecklist('debit')"><span>📑</span> <strong>2. Notes de débit</strong></div>
+        <div class="card" onclick="startChecklist('facturation')"><span>🧾</span> <strong>4. Facturation</strong></div>
+        
+        <div id="history-container" class="history-section hidden">
+            <p>HISTORIQUE RÉCENT</p>
+            <div id="history-list"></div>
+        </div>
+    </div>
+</div>
 
-        const COLORS = {
-            red: "#C01030",
-            redLight: "#FDF2F2",
-            navy: "#1A3068",
-            navyLight: "#EEF0F7",
-            dark: "#1A1A1A",
-            gray: "#6B7280",
-            grayLight: "#F3F4F6",
-            border: "#E5E7EB",
-            white: "#FFFFFF",
-            green: "#059669",
-            greenLight: "#ECFDF5",
-            amber: "#D97706",
-        };
+<div id="view-subtypes" class="container hidden">
+    <button class="btn-back" onclick="showView('view-home')">← RETOUR</button>
+    <h3 id="subtype-title">Type de protocole</h3>
+    <div id="subtype-list"></div>
+</div>
 
-        const PROCESSES = {
-            ndf: {
-                title: "1. Notes de Frais (NDF)",
-                icon: "📋",
-                subTypes: {
-                    interne: { label: "Cas interne", color: COLORS.navy },
-                    externe_physique: { label: "Cas externe — Physique", color: COLORS.navy },
-                    externe_moral: { label: "Cas externe — Moral", color: COLORS.red },
-                },
-                checks: {
-                    interne: [
-                        { id: "ndf_int_1", text: "Objet de la dépense précisé (événement générateur)" },
-                        { id: "ndf_int_2", text: "Montants et dates vérifiés entre justificatifs et déclaré" },
-                        { id: "ndf_int_3", text: "Code analytique noté (budget département)" },
-                        { id: "ndf_int_4", text: "Affaire : code vérifié sur ERP (Présence/Ouverture)" },
-                        { id: "ndf_int_5", text: "Repas : vérifier si TR (titre-restaurant) → non remboursable" },
-                        { id: "ndf_int_6", text: "Si absence d'originaux → attestation sur l'honneur jointe" },
-                        { id: "ndf_int_7", text: "Frais kilométriques transmis au responsable" },
-                    ],
-                    externe_physique: [
-                        { id: "ndf_ep_1", text: "Objet de la dépense précisé" },
-                        { id: "ndf_ep_4", text: "Affaire : code vérifié sur ERP de référence" },
-                        { id: "ndf_ep_7", text: "Frais kilométriques transmis au pôle validation" },
-                    ],
-                    externe_moral: [
-                        { id: "ndf_em_1", text: "⚠ FACTURE obligatoire (personne morale)", alert: true },
-                        { id: "ndf_em_2", text: "Bon modèle utilisé (moral ≠ physique)", alert: true },
-                        { id: "ndf_em_6", text: "Affaire : code vérifié sur ERP de référence" },
-                    ],
-                },
-            },
-            debit: {
-                title: "2. Notes de débit",
-                icon: "📑",
-                subTypes: null,
-                checks: {
-                    default: [
-                        { id: "deb_1", text: "Justificatifs + attestation sur l'honneur reçus" },
-                        { id: "deb_2", text: "Ordre : Note de débit → Attestation → Récap justificatifs" },
-                        { id: "deb_4", text: "⚠ Aucun code achat / analytique saisi", alert: true },
-                        { id: "deb_5", text: "Affectation transmise au pôle validation" },
-                    ],
-                },
-            },
-            facturation: {
-                title: "4. Facturation",
-                icon: "🧾",
-                subTypes: null,
-                checks: {
-                    default: [
-                        { id: "fac_1", text: "ERP : code action/affaire/analytique vérifié" },
-                        { id: "fac_4", text: "Code article vérifié (Service / Honoraires / Conseil)" },
-                        { id: "fac_6", text: "Bénéficiaire indiqué sur la facture", section: "Mentions obligatoires" },
-                        { id: "fac_8", text: "Numéro SIRET et coordonnées bancaires présents" },
-                    ],
-                },
+<div id="view-checklist" class="container hidden">
+    <button class="btn-back" onclick="goBackFromChecklist()">← RETOUR</button>
+    <div class="progress-container"><div id="progress-bar" class="progress-bar"></div></div>
+    <input type="text" id="dossier-ref" class="input-ref" placeholder="Référence du dossier...">
+    <div id="check-list"></div>
+    <button class="btn-finish" onclick="finishDossier()">TERMINER ET SAUVEGARDER</button>
+</div>
+
+<script>
+    // DONNÉES ANONYMISÉES
+    const DATA = {
+        ndf: {
+            title: "Notes de Frais",
+            subTypes: [
+                { id: 'int', label: "Cas interne", color: '#1A3068' },
+                { id: 'ext_p', label: "Cas externe (Physique)", color: '#1A3068' },
+                { id: 'ext_m', label: "Cas externe (Moral)", color: '#C01030' }
+            ],
+            checks: {
+                int: [
+                    { text: "Événement générateur précisé (Objet)" },
+                    { text: "Concordance montants/dates" },
+                    { text: "Code analytique budget service noté" },
+                    { text: "Code affaire vérifié sur ERP" },
+                    { text: "Vérification absence de cumul Titre-Resto" }
+                ],
+                ext_p: [{ text: "Objet dépense précisé" }, { text: "Code affaire vérifié sur ERP" }],
+                ext_m: [{ text: "FACTURE obligatoire", alert: true }, { text: "Modèle XLS spécifique moral", alert: true }]
             }
-        };
+        },
+        debit: {
+            title: "Notes de débit",
+            checks: { default: [{ text: "Justificatifs + attestation reçus" }, { text: "Séquençage Note > Attestation > Récap" }, { text: "Aucun code analytique saisi", alert: true }] }
+        },
+        facturation: {
+            title: "Facturation",
+            checks: { default: [{ text: "ERP : codes action/affaire/analytique" }, { text: "Montant engagé vs facturé" }, { text: "SIRET et coordonnées bancaires présents" }] }
+        }
+    };
 
-        const STORAGE_KEY = "interbev-checklist-v2";
+    let currentProcess = '';
+    let currentSub = '';
+    let history = JSON.parse(localStorage.getItem('itb_history') || '[]');
 
-        function App() {
-            const [process, setProcess] = useState(null);
-            const [subType, setSubType] = useState(null);
-            const [checked, setChecked] = useState({});
-            const [dossierName, setDossierName] = useState("");
-            const [history, setHistory] = useState([]);
-            const [showHistory, setShowHistory] = useState(false);
+    function showView(id) {
+        document.querySelectorAll('.container, #view-home').forEach(v => v.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+        if(id === 'view-home') renderHistory();
+    }
 
-            useEffect(() => {
-                const saved = localStorage.getItem(STORAGE_KEY);
-                if (saved) {
-                    const d = JSON.parse(saved);
-                    if (d.history) setHistory(d.history);
-                }
-            }, []);
-
-            const currentChecks = process ? (PROCESSES[process]?.checks?.[subType || "default"] || []) : [];
-            const progress = currentChecks.length ? Math.round((currentChecks.filter(c => checked[c.id]).length / currentChecks.length) * 100) : 0;
-
-            const toggle = (id) => setChecked(prev => ({ ...prev, [id]: !prev[id] }));
-
-            const resetChecklist = () => {
-                if (progress > 0 && dossierName) {
-                    const newHistory = [{
-                        name: dossierName,
-                        process: PROCESSES[process]?.title,
-                        date: new Date().toLocaleDateString("fr-FR"),
-                        progress
-                    }, ...history].slice(0, 10);
-                    setHistory(newHistory);
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify({ history: newHistory }));
-                }
-                setChecked({});
-                setDossierName("");
-            };
-
-            if (!process) {
-                return (
-                    <div>
-                        <div style={{ background: `linear-gradient(135deg, ${COLORS.navy} 0%, ${COLORS.red} 100%)`, padding: "32
+    function showSubTypes(id) {
+        currentProcess = id;
+        const list = document.getElementById('subtype-list');
+        list.innerHTML = '';
+        DATA[id].subTypes.forEach(st
